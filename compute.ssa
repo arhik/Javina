@@ -1,0 +1,9 @@
+
+
+function w $compute(w %b) {            # Define a function add
+@start
+	%c =w call $eval_l(w %b)
+	%d =w call $eval_r(w %b)
+	%e =w mul %c, %d              # mul the 2 arguments
+	ret %e                             # Return the result
+}

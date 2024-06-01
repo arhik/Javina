@@ -1,0 +1,9 @@
+        # Define the string constant.
+        data $hello5 = { b "Hello Wo are you ?", b 0 }
+        
+        export function w $main() {
+        @start
+                # Call the puts function with $str as argument.
+                %r =w call $puts(l $hello5)
+                ret 0
+        }

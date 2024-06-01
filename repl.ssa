@@ -1,0 +1,8 @@
+export function w $printstring() {
+	
+}
+
+export function w $repl() {
+	@start
+		%s
+}
