@@ -1,0 +1,18 @@
+# Define the string constant.
+data $welcome_str = { b "Welcome to Javina: ", b 0 }
+data $prompt = { b "javina>" }
+data $input_buffer = { z 65536 }
+
+export function w $main() {
+@start
+        # Call the puts function with $str as argument.
+        call $puts(l $welcome_str)
+@loop
+        call $puts(l $prompt)
+        %r =w call $fgets(l $input_buffer, w 65536, stdin)
+       	%s =w call $puts(l $input_buffer)
+       	jnz %r, @loop, @end
+@end
+        ret 0
+}
+

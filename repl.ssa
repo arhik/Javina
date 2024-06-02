@@ -1,8 +1,55 @@
-export function w $printstring() {
-	
+data $welcome_msg = { b "Welcome to Javina Programming Language\n", b 0 }
+data $buffer = { b 0, w 65536 }
+data $prompt = { b "javina> ", b 0 }
+
+export
+function w $main() {
+@start
+    %fd_in =w copy 0        # file descriptor for stdin
+    %fd_out =w copy 1       # file descriptor for stdout
+    %size =w copy 65536     # maximum bytes to read/write
+
+@repl_loop
+    # Print prompt
+    %promptlen =w call $strlen(l $prompt)
+    %res =w call $sys_write(w %fd_out, w $prompt, w %promptlen)
+    
+    # Read user input
+    %n_read =w call $read_string(w %fd_in, w $buffer, w %size)
+    
+    # Echo user input back to stdout
+    %res =w call $sys_write(w %fd_out, w $buffer, w %n_read)
+    
+    # Loop back to the prompt
+    jnz %n_read, @repl_loop, @repl_end
+@repl_end
+    ret 0
 }
 
-export function w $repl() {
-	@start
-		%s
+export
+function w $read_string(w %fd, w %buffer, w %size) {
+@start
+    %n_read =w call syscall 0, 0, %fd, %buffer, %size, 0, 0
+    ret %n_read
+}
+
+export
+function w $sys_write(w %fd, w %buffer, w %size) {
+@start
+    %n_written =w call syscall 1, 0, %fd, %buffer, %size, 0, 0
+    ret %n_written
+}
+
+export
+function w $strlen(l %str) {
+@start
+    %len =w copy 0
+@strlenloop
+    %byte =l load %str
+    %is_zero =w ceqw %byte, 0
+    %str =l add %str, 1
+    %len =w add %len, 1
+    jnz %is_zero, @strlenloop, @strlenend
+@strlenend
+    ret %len
 }
