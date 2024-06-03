@@ -13,9 +13,13 @@ transpile(scope::Scope, var::Ref{JVVariable}) = transpile(scope, var[])
 
 transpile(scope::Scope, lhs::LHS) = transpile(scope, lhs.expr)
 transpile(scope::Scope, rhs::RHS) = transpile(scope, rhs.expr)
+
+# TODO we may have to specialize like below
+# for now we are directly emitting code
 transpile(scope::Scope, binOp::BinaryOp) = transpile(scope, binOp, Val(binOp.op))
 
 # for each op in [:+, :-, :*, :\, :<, :>, :<=, :>=, :==, :+=, :-=]
+# TODO these are side stepped for now. We can consider them we we feel its more performant
 transpile(scope::Scope, binOp::BinaryOp, op::Val{:+}) = :($(transpile(scope, binOp.left)) + $(transpile(scope, binOp.right)))
 transpile(scope::Scope, binOp::BinaryOp, op::Val{:-}) = :($(transpile(scope, binOp.left)) - $(transpile(scope, binOp.right)))
 transpile(scope::Scope, binOp::BinaryOp, op::Val{:*}) = :($(transpile(scope, binOp.left)) * $(transpile(scope, binOp.right)))
@@ -151,8 +155,11 @@ function transpile(scope::Scope, atomicExpr::JVAtomics)
 		if op == :+=
 			transpiledlExpr = (transpile(scope, lExpr))
 			transpiledrExpr = (transpile(scope, rExpr))
-			@infiltrate
 			return :(atomicAdd(@ptr($transpiledlExpr), @ptr($transpiledrExpr)))
 		end
 	end
+end
+
+function transpile(scope::Scope, returnExpr::ReturnBlock)
+    :(return $(transpile(scope, returnExpr.ret)))
 end

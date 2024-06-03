@@ -211,9 +211,11 @@ inferredExpr = inferExpr(
 		c[i] = d[i] + c[i] + 1.0
 	end)
 )
+
 transpile(scope, inferredExpr)
 
 # -----
+
 scope = Scope(
 	Dict(
 		makeVarPair(:a=>Array{Float32, 16}),
@@ -235,9 +237,11 @@ inferredExpr = inferExpr(
 		end
 	end)
 )
+
 transpile(scope, inferredExpr)
 
 # -----
+
 scope = Scope(
 	Dict(
 		#makeVarPair(:x=>Int32),
@@ -261,9 +265,11 @@ inferredExpr = inferExpr(
 		end
 	)
 )
+
 transpile(scope, inferredExpr)
 
 # ----
+
 scope = Scope(
 	Dict(
 		makeVarPair(:println=>Function)
@@ -271,6 +277,7 @@ scope = Scope(
 	Dict(),
 	Dict(), 0, nothing, quote end
 )
+
 inferredExpr = inferExpr(
 	scope,
 	:(function test(a::Float32, b::Float32)
@@ -279,5 +286,44 @@ inferredExpr = inferExpr(
 		end
 	end)
 )
+
 transpile(scope, inferredExpr)
+
 # ----------
+
+using Javina
+using Javina: jvCode
+
+jvCode(transpile(scope, inferredExpr))
+
+
+# ----------
+
+scope = Scope(
+	Dict(
+		makeVarPair(:println=>Function)
+	),
+	Dict(),
+	Dict(), 0, nothing, quote end
+)
+
+inferredExpr = inferExpr(
+	scope,
+	:(function add(a::UInt32, b::UInt32)
+		c = a + b
+		return c
+	end)
+)
+
+transpile(scope, inferredExpr)
+
+# ----------
+
+using Javina
+using Javina: jvCode
+
+jvCode(transpile(scope, inferredExpr)) |> println
+
+# ----------
+
+
