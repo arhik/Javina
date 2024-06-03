@@ -67,7 +67,8 @@ end
 function jvAssignment(expr)
 	io = IOBuffer()
 	if @capture(expr, a_ = b_)
-		write(io, "$(jvType(a)) = $(jvType(b));\n")
+	   @infiltrate
+		write(io, "%$(jvType(a)) =w $(jvType(b));\n") # TODO
 		seek(io, 0)
 		stmnt = read(io, String)
 		close(io)
@@ -125,7 +126,7 @@ function jvFunctionStatement(io, stmnt; indent=true, indentLevel=0)
 		stmnt.args[1] = Symbol("@letvar") # replace let with letvar
 		write(io, jvLet(stmnt))
 	elseif @capture(stmnt, return t_)
-		write(io, "return $(jvType(t));\n")
+		write(io, "return %$(jvType(t));\n")
 	elseif @capture(stmnt, if cond_ ifblock__ end)
 		if cond == true
 			jvFunctionStatements(io, ifblock;indent=true, indentLevel=indentLevel)
@@ -167,6 +168,7 @@ function jvFunctionStatements(io, stmnts; indent=true, indentLevel=0)
 		if indent==true
 			write(io, " "^(4*indentLevel))
 		end
+		@infiltrate
 		jvFunctionStatement(io, stmnt; indent=true, indentLevel=indentLevel+1)
 	end
 end
@@ -206,17 +208,10 @@ function jvFunctionBody(fnbody, io, endstring)
 		len = length(fnargs)
 		endstring = len > 0 ? "}\n" : ""
 		for (idx, arg) in enumerate(fnargs)
-			if @capture(arg, aarg_::aatype_)
-				intype = jvType(eval(aatype))
-				write(io, "$(intype) %$aarg"*(len==idx ? "" : ", "))
-			elseif @capture(arg, @builtin e_ id_::typ_)
-				intype = jvType(eval(typ))
-				write(io, "@builtin($e) $id:$(intype)")
-			elseif @capture(arg, @location e_ id_::typ_)
-				intype = jvType(eval(typ))
-				write(io, "@location($e) $id:$(intype)")
-			end
-			write(io, idx == length(fnargs) ? "" : ", ")
+			@capture(arg, aarg_::aatype_)
+		    intype = jvType(eval(aatype))
+			write(io, "$(intype) %$aarg"*(len==idx ? "" : ", "))
+			#write(io, idx == length(fnargs) ? "" : ", ")
 			# TODO what is this check ... not clear
 			@capture(fnargs, aarg_) || error("Expecting type for function argument in jv!")
 		end
@@ -242,7 +237,7 @@ end
 
 function jvVariable(expr)
 	io = IOBuffer()
-	write(io, "%$(jvType(eval(expr)))") # TODO
+	write(io, jvType(eval(expr)))
 	seek(io, 0)
 	code = read(io, String)
 	close(io)
@@ -252,7 +247,9 @@ end
 # TODO for now both jvVariable and jvLet are same
 function jvLet(expr)
 	io = IOBuffer()
-	write(io, jvType(eval(expr)))
+	@capture(expr, @letvar rest_)
+	@infiltrate
+	write(io, "$(jvAssignment(rest))")
 	seek(io, 0)
 	code = read(io, String)
 	close(io)

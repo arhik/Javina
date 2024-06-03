@@ -98,26 +98,25 @@ jvType(val::Val{T}) where T = jvType(T)
 function jvType(a::Symbol)
 	if !isdefined(@__MODULE__, a)
 		return string(a)
-	elseif typeof(eval(a)) <: UserStruct
-		return string(a)
 	else
 		return jvType(eval(a))
 	end
 end
 
-jvType(::typeof(*)) = "*"
-jvType(::typeof(+)) = "+"
-jvType(::typeof(/)) = "/"
-jvType(::typeof(-)) = "-"
+jvType(::typeof(*)) = "mul"
+jvType(::typeof(+)) = "add"
+jvType(::typeof(/)) = "div"
+jvType(::typeof(-)) = "sub"
 
 
 # TODO nested operations with operator precedence
 # For now add brackets manually
 function jvOperation(op, x, y)
+    # TODO other cases of mixed Number and var
 	if typeof(x) <: Number && typeof(y) <: Number
-		return "$(jvType(x)) $op $(jvType(y))"
+		return "$(jvType(op)) $(jvType(x)), $(jvType(y))"
 	else
-		return "$x $op $y"
+		return "$(jvType(op)) %$(jvType(x)), %$(jvType(y))"
 	end
 end
 
