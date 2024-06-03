@@ -49,6 +49,10 @@ function inferExpr(scope::Scope, expr::Expr)
 		return funcBlock(scope, fname, fargs, Targs, fbody)
     elseif @capture(expr, return ret_)
         return returnBlock(scope, ret)
+    elseif @capture(expr, module modname_ modblock__ end)
+        return moduleBlock(scope, modname, modblock)
+    elseif @capture(expr, export name_)
+        return exportExpr(scope, name)
 	else
 		error("Couldn't capture $expr")
 	end

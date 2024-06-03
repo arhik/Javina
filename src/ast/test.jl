@@ -299,25 +299,20 @@ jvCode(transpile(scope, inferredExpr))
 
 # ----------
 
-scope = Scope(
-	Dict(
-		makeVarPair(:println=>Function)
-	),
-	Dict(),
-	Dict(), 0, nothing, quote end
-)
+scope = Scope()
 
 inferredExpr = inferExpr(
 	scope,
 	:(function add(a::UInt32, b::UInt32)
 		c = a + b
-		return c
+		d = c + a
+		e = c + d
+		return e
 	end)
 )
 
 transpile(scope, inferredExpr)
 
-# ----------
 
 using Javina
 using Javina: jvCode
@@ -326,4 +321,27 @@ jvCode(transpile(scope, inferredExpr)) |> println
 
 # ----------
 
+scope = Scope()
+
+moduleExpr = :(module JVModule
+		export jvmain
+
+		function add(a::Int64, b::Int64)
+			c = a + b
+			return c
+		end
+		
+		function jvmain()
+			r = add(1, 3)
+			#println("Hello $r")
+			return nothing
+		end
+	end
+)
+	
+inferredExpr = inferExpr(scope, moduleExpr)
+
+transpile(scope, inferredExpr)
+
+jvCode(transpile(scope, inferredExpr)) |> println
 

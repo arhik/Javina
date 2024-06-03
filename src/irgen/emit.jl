@@ -67,7 +67,6 @@ end
 function jvAssignment(expr)
 	io = IOBuffer()
 	if @capture(expr, a_ = b_)
-	   @infiltrate
 		write(io, "%$(jvType(a)) =w $(jvType(b));\n") # TODO
 		seek(io, 0)
 		stmnt = read(io, String)
@@ -168,7 +167,6 @@ function jvFunctionStatements(io, stmnts; indent=true, indentLevel=0)
 		if indent==true
 			write(io, " "^(4*indentLevel))
 		end
-		@infiltrate
 		jvFunctionStatement(io, stmnt; indent=true, indentLevel=indentLevel+1)
 	end
 end
@@ -248,7 +246,6 @@ end
 function jvLet(expr)
 	io = IOBuffer()
 	@capture(expr, @letvar rest_)
-	@infiltrate
 	write(io, "$(jvAssignment(rest))")
 	seek(io, 0)
 	code = read(io, String)

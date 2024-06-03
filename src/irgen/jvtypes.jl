@@ -22,12 +22,13 @@ juliaToJVTypes = Dict(
 )
 
 jvType(a::Bool) = a;
-jvType(a::Int32) = "$(a)i";
+jvType(a::Int32) = "$*%$(a)";
 jvType(a::UInt32) = "$(a)u";
 jvType(a::Float16) = "$(a)"; #TODO refer to jv specs and update this
 jvType(a::Float32) = "$(a)";
 jvType(a::Int) = a;
 jvType(a::Number) = a;
+jvType(a::Nothing) = nothing
 
 function jvType(::Type{Vec2{T}}) where {T}
 	return "vec2<$(jvType(T))>"
@@ -131,7 +132,7 @@ function jvType(expr::Union{Expr, Type{Expr}})
 		# @capture(expr, f_(x_, y_)) && !(f in (:*, :-, :+, :/)) && return "$(eval(f))($(x), $(y))"
 		@capture(expr, f_(x__)) && begin
 			xargs = join(jvType.(x), ", ")
-			return "$(jvType(eval(f)))($(xargs))"
+			return "$(jvType(f))($(xargs))"
 		end
 	elseif @capture(expr,@ptr(ex_))
 		return "&$(jvType(ex))"

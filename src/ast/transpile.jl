@@ -163,3 +163,11 @@ end
 function transpile(scope::Scope, returnExpr::ReturnBlock)
     :(return $(transpile(scope, returnExpr.ret)))
 end
+
+function transpile(scope::Scope, moduleblk::ModuleBlock)
+    code = quote end
+    for expr in moduleblk.block
+        push!(code.args, transpile(scope, expr))
+    end
+    return code
+end
