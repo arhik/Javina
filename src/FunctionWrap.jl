@@ -11,22 +11,13 @@ end
 
 function addInts(a::Int64, b::Int64)
 	c = a + b
-	d = c + b
-	return d
-end
-
-function add2Ints(a::Int64, b::Int64) 
-	c = a + b
-	d = c + b
-	return d
+	return c
 end
 
 function workit(a::Int64, b::Int64, c::Int64)
 	d = addInts(b, c)
-	e = add2Ints(d, c)
-	f = e + d
-	g = e + f
-	return g
+	e = a + d
+	return e
 end
 
 end
