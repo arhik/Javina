@@ -144,15 +144,15 @@ function compileModule(mod::Module, static::Bool=true)
 
 	@info qbessa
 	
-	open("print.ssa", "w") do f
+	open("$(nameof(mod)).ssa", "w") do f
 		write(f, qbessa)
 		close(f)
 	end
 	
 	@sync   begin
-		cmd1 = Cmd(`qbe -o print.s print.ssa`)
-		cmd2 = Cmd(`cc -o print print.s`)
-		cmd3 = Cmd(`./print`)
+		cmd1 = Cmd(`qbe -o $(nameof(mod)).s $(nameof(mod)).ssa`)
+		cmd2 = Cmd(`cc -o $(nameof(mod)).jn $(nameof(mod)).s`)
+		cmd3 = Cmd(`$(nameof(mod)).jn`)
 		result = success(
 			run(
 				pipeline(
