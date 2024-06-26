@@ -122,8 +122,8 @@ end
 
 function compileAggregate(io, h::DataType)
 	write(io, "type :$(nameof(h)) = { ")
-	for (field, ftype) in zip(fieldnames(h), fieldtypes(h))
-		write(io, length(fieldCount) ? "$ftype, " : "$ftype")
+	for (idx, (field, ftype)) in enumerate(zip(fieldnames(h), fieldtypes(h)))
+		write(io, fieldcount(h) != idx ? "$ftype, " : "$ftype ")
 	end
 	write(io, "}\n")
 end
