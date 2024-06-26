@@ -22,7 +22,7 @@ function print(s::DataString)
 		        %r =w call \$puts(l \$$(s.name))
 		        ret 0
 		}
-	"""
+		"""
 	open("print.ssa", "w") do f
 		write(f, a)
 		close(f)
@@ -72,7 +72,7 @@ end
 end
 
 atypes = Tuple{Int, Int, Int} # argument types
-mths = methods(workit, atypes) # worth checking that there is only one
+mths = methods(Add2Ints.workit, atypes) # worth checking that there is only one
 m = first(mths)
 # Create variables needed to call `typeinf_code`
 interp = Core.Compiler.NativeInterpreter()
@@ -123,7 +123,7 @@ end
 function compileAggregate(io, h::DataType)
 	write(io, "type :$(nameof(h)) = { ")
 	for (field, ftype) in zip(fieldnames(h), fieldtypes(h))
-		write(io, length(fieldCount) ? "$ftype, ")
+		write(io, length(fieldCount) ? "$ftype, " : "$ftype")
 	end
 	write(io, "}\n")
 end
@@ -160,4 +160,6 @@ function compileModule(mod::Module, static::Bool=true)
 end
 
 compileModule(Add2Ints)
+
+
 
